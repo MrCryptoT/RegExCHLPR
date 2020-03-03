@@ -35,8 +35,14 @@ Module Module1
         Dim Listofallfilesindirectory As New ArrayList
         'get a list of all files in directory and sub dirs
         'then check if any of them matches the given regex, if so, start the file an store new path in Array
-        Listofallfilesindirectory = GetFileList(Environment.ExpandEnvironmentVariables(directorystr), True)
-
+        If directorystr.ToString.Contains("&&") Then
+            Dim temparray = StringtoArray(directorystr, "&&")
+            For Each dirstring In temparray
+                Listofallfilesindirectory.Add(GetFileList(Environment.ExpandEnvironmentVariables(dirstring), True))
+            Next
+        Else
+            Listofallfilesindirectory = GetFileList(Environment.ExpandEnvironmentVariables(directorystr), True)
+        End If
         'compare regex
 
 
@@ -93,6 +99,42 @@ Module Module1
         End If
 
     End Sub
+
+    Function StringtoArray(seperatedmultistring As String, seperator As String) As ArrayList
+        'reset returnarray if it s not null (redim it with 0 members)
+        Dim returnarray As New ArrayList
+        'set counter
+        Dim Charsalreadyscanned = 0
+        'make temp var to not change original input var
+        Dim tempstring = seperatedmultistring
+        Dim foundwords = 0
+        Dim lastchar = ""
+        For i = 0 To seperatedmultistring.ToString.Length Step 1
+            If (seperatedmultistring.ToString.Length = 0) Then
+                'empty string was given, reutrn null
+                Throw New ArgumentException("Calling this Function without Input (enmpty string) is NOT valid!")
+            End If
+            If (i = seperatedmultistring.ToString.Length) Then
+                Exit For
+            End If
+            'check if current char is the seperator sign
+            If (seperatedmultistring.Substring(i, 1) & lastchar = seperator) Then
+                'seperator sign found
+                Dim scannedtext = tempstring.Substring(Charsalreadyscanned, i - Charsalreadyscanned)
+                Dim temparraymember = scannedtext.Substring(0, scannedtext.Length)
+                Charsalreadyscanned = Charsalreadyscanned + scannedtext.Length + 1
+                If temparraymember.Length = 0 Then
+                    returnarray.Add(temparraymember.Substring(0, temparraymember.Length).ToString)
+
+                ElseIf temparraymember.Length > 0 Then
+                    returnarray.Add(temparraymember.Substring(0, temparraymember.Length - 1).ToString)
+                End If
+                foundwords = foundwords + 1
+            End If
+            lastchar = seperatedmultistring.Substring(i, 1)
+        Next
+        Return returnarray
+    End Function
 
 
     Function GetFileList(ByVal DirPath As String,
