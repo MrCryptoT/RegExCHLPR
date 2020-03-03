@@ -38,9 +38,15 @@ Module Module1
         If directorystr.ToString.Contains("&&") Then
             Dim temparray = StringtoArray(directorystr, "&&")
             For Each dirstring In temparray
-                Listofallfilesindirectory.Add(GetFileList(Environment.ExpandEnvironmentVariables(dirstring), True))
+                Dim tempresultarray As New ArrayList
+                tempresultarray = GetFileList(Environment.ExpandEnvironmentVariables(dirstring), True)
+                For Each CandidateFile In tempresultarray
+                    'add each found file to fiellistarray 
+                    Listofallfilesindirectory.Add(CandidateFile)
+                Next
+
             Next
-        Else
+                Else
             Listofallfilesindirectory = GetFileList(Environment.ExpandEnvironmentVariables(directorystr), True)
         End If
         'compare regex
@@ -68,6 +74,7 @@ Module Module1
 
         If filefound = False Then
             'no file found, ask user to readd - maybe file was moved or deleted
+            Console.WriteLine("Couldn't find a File")
             Return
         Else
             'get file with most current edit date and execute it
