@@ -35,8 +35,8 @@ Module Module1
         Dim Listofallfilesindirectory As New ArrayList
         'get a list of all files in directory and sub dirs
         'then check if any of them matches the given regex, if so, start the file an store new path in Array
-        If directorystr.ToString.Contains("&&") Then
-            Dim temparray = StringtoArray(directorystr, "&&")
+        If directorystr.ToString.Contains("\\") Then
+            Dim temparray = StringtoArray(directorystr, "\\")
             For Each dirstring In temparray
                 Dim tempresultarray As New ArrayList
                 tempresultarray = GetFileList(Environment.ExpandEnvironmentVariables(dirstring), True)
@@ -46,7 +46,7 @@ Module Module1
                 Next
 
             Next
-                Else
+        Else
             Listofallfilesindirectory = GetFileList(Environment.ExpandEnvironmentVariables(directorystr), True)
         End If
         'compare regex
